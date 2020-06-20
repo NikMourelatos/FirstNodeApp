@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Socket.IO chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font: 13px Helvetica, Arial;
+        }
+        
+        #textForm {
+            background: #000;
+            padding: 3px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        #m {
+            border: 0;
+            padding: 10px;
+            width: 90%;
+            margin-right: 0.5%;
+        }
+        
+        #button1 {
+            width: 9%;
+            background: rgb(130, 224, 255);
+            border: none;
+            padding: 10px;
+        }
+        
+        #messages {
+            list-style-type: none;
+            margin: 100;
+            padding: 0;
+            font-size: larger;
+        }
+        
+        #messages li {
+            padding: 5px 10px;
+        }
+        
+        #messages li:nth-child(odd) {
+            background: #eee;
+        }
+        
+        #popUp {
+            position: fixed;
+            /* or absolute */
+            top: 45%;
+            left: 45%;
+            z-index: 10px;
+            ;
+        }
+        
+        #picForm {
+            margin: 0px 10px 0px 0px;
+            padding: 5px;
+            background-color: #f3f;
+            position: absolute;
+            top: 90%;
+        }
+    </style>
+</head>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+    $(function() {
+        var socket = io();
+
+        $('#nameForm').submit(function(e) {
+            e.preventDefault();
+            socket.emit("user connect", $("#field2").val());
+            //console.log(("field2").val());
+
+            document.getElementById('popUp').remove();
+
+
+        });
+        $('#textForm').submit(function(e) {
+            console.log("why:");
+            e.preventDefault(); // prevents page reloading
+            if ($('#m').val() != '') {
+                socket.emit('chat message', $('#m').val());
+                $('#m').val('');
+            }
+            return false;
+        });
+        /*
+        function testing() {
+            var p = document.getElementById("testElement");
+            console.log(p.innerHTML);
+        }
+        */
+        socket.on('chat message', function(msg) {
+            console.log(msg);
+            var el = document.createElement('li');
+            el.id = "testElement";
+            el.innerHTML = msg;
+            document.getElementById('messages').append(el);
+            //esting();
+            //$('#messages').append($('<li>').text(msg));
+        });
+        socket.on('user connect', function(msg) {
+            console.log(msg);
+            $('#messages').append($('<li>').text(msg + " connected"));
+
+        });
+    });
+</script>
+
+<body>
+    <ul id="messages"></ul>
+    <div id="popUp">
+        <p>Please Enter your name</p>
+        <form id="nameForm">
+            <input id="field2" autocomplete="off" />
+            <button>Send</button>
+        </form>
+    </div>
+    <form id="textForm" action="">
+        <input id="m" autocomplete="off" type="text" />
+        <button id="button1">Send</button>
+    </form>
+    <form id="picForm" enctype="multipart/form-data">
+        <input id="pic" type="file" />
+        <button id="button2">Send</button>
+    </form>
+</body>
+
+</html>
